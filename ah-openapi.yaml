@@ -21,6 +21,10 @@ tags:
   - name: Bonus > Bonusbox
   - name: Receipts
     description: Information about previous visits
+  - name: Premium membership
+    description: AH Premium membership related calls
+  - name: Purchase stamps
+    description: Information about purchase stamps program (koopzegels)
   - name: Stamps
     description: Information about loyalty programs
   - name: AH to go
@@ -7681,6 +7685,253 @@ paths:
                   - type: spacer
                 storeId: 0
                 transactionMoment: '2021-01-01T13:37:00Z'
+  /mobile-services/member/v3/member:
+    get:
+      tags:
+        - Premium membership
+      summary: Retrieve membership information
+      description: Retrieve AH Premium membership information
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                memberId: 123
+                email: foo@bar.ah
+                knownUser: true
+                webshopDiscountEnabled: true
+                bonusServicesEnabled: true
+                loyaltyCards:
+                  - id: "123"
+                    type: "AM"
+                  - id: "262"
+                    type: "BO"
+                memberships:
+                  - MEMBER
+                  - SHOPPINGLIST
+                  - FAVOURITE_STORE
+                  - SHORTLIST_COLLECTED_RECIPES
+                  - WEBSHOP
+                  - AIRMILES_EXTRA
+                  - LOYALTY
+                  - PERSONAL_OFFERS
+                  - PRIVILEGES
+                  - PURCHASES
+                  - SELF_SCAN
+                  - DIGITAL_AH_STAMPS_BOOSTER
+                  - PREMIUM
+                  - PURCHASE_STAMPS_OPT
+                  - NUTRIENT_RECOMMENDATIONS
+                  - DIGITAL_SAVINGS
+                  - PURCHASE_STAMPS_ON
+                  - AIRMILES_REDEMPTION
+                  - SOCCER_PASSION
+                  - PERSONAL_OFFERS_IMPROVEMENTS
+                  - AH_MILES_PREMIUM
+                subscriptions:
+                  - DIGITAL_SAVINGS
+                  - LOYA_OPT
+                  - POST_OPT
+                  - WW_TTR_SMS
+                address:
+                  street: "Foostreet"
+                  houseNumber: "123"
+                  houseNumberExtra: null
+                  zipCode: "1111 AA"
+                  city: "AMSTERDAM"
+                  country: "NLD"
+                phoneNumber: "+316xxxxxxxx"
+                dateOfBirth: "1970-01-01"
+                name:
+                  title: null
+                  firstName: "John"
+                  initials: null
+                  middleName: null
+                  surname: "Doe"
+                gender: "male"
+                memberType: "B2C"
+                externalIds:
+                  - externalId: foo
+                    type: AM_ID
+                  - externalId: foo
+                    type: BATCHCOM
+                  - externalId: foo
+                    type: CDP_ID
+                  - externalId: foo
+                    type: DMP_ID
+                  - externalId: foo
+                    type: FIREBASE
+                  - externalId: foo
+                    type: GOOGLE_AN
+                  - externalId: foo
+                    type: MONETIZAT
+                  - externalId: foo
+                    type: SELL_ID
+                  - externalId: foo
+                    type: SITESPECT
+  /mobile-services/member/v3/membership:
+    delete:
+      tags:
+        - Premium membership
+      summary: Disable a membership
+      description: Disable a membership, like for instance saving twice as fast
+      parameters:
+        - in: query
+          name: membership
+          schema:
+            type: string
+            example: 'DIGITAL_AH_STAMPS_BOOSTER'
+    post:
+      tags:
+        - Premium membership
+      summary: Enable a membership
+      description: Enable a membership
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/x-www-form-urlencoded; charset=utf-8
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              example:
+                membership: 'DIGITAL_AH_STAMPS_BOOSTER'
+  /mobile-services/v1/purchase-stamps:
+    get:
+      tags:
+        - Purchase stamps
+      summary: Stamps
+      description: >-
+        Get information about the current purchase stamp colletion program, including current balance and latest 10 transactions. To be deprecated.
+      parameters:
+        - name: x-application
+          in: header
+          schema:
+            type: string
+          example: AHWEBSHOP
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            X-Deprecated:
+              schema:
+                type: string
+                example: 'WARNING: Deprecated, split into /v1/purchase-stamps/transactions and /v1/purchase-stamps/balance'
+          content:
+            application/json:
+              example:
+                balance:
+                  points:
+                    total: 2528
+                    fullBooklets: 5
+                    current: 78
+                    bookletTargets:
+                      halfBooklet: 255
+                      fullBooklet: 490
+                  money:
+                    total: 263.9
+                    earnings: 15
+                    investment: 248.9
+                transactions:
+                  - amount: 6
+                    type: BOUGHT
+                    date: '2022-07-31T17:46:04'
+                    reason: COLLECT_STORE
+                    hash: 689210023
+                    savingsBoosted: true
+                  - amount: 40
+                    type: BOUGHT
+                    date: '2022-07-31T14:59:05'
+                    reason: COLLECT_STORE
+                    hash: 689210023
+                    savingsBoosted: false
+  /mobile-services/v1/purchase-stamps/balance:
+    get:
+      tags:
+        - Purchase stamps
+      summary: Stamps balance
+      description: >-
+        Get current balance from the purchase stamp program.
+      parameters:
+        - name: x-application
+          in: header
+          schema:
+            type: string
+          example: AHWEBSHOP
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              example:
+                points:
+                  total: 2528
+                  fullBooklets: 5
+                  current: 78
+                  bookletTargets:
+                    halfBooklet: 255
+                    fullBooklet: 490
+                money:
+                  total: 263.9
+                  earnings: 15
+                  investment: 248.9
+  /mobile-services/v1/purchase-stamps/transactions:
+    get:
+      tags:
+        - Purchase stamps
+      summary: Stamps transactions
+      description: >-
+        Get latest 50 transactions from the purchase stamp program.
+      parameters:
+        - name: x-application
+          in: header
+          schema:
+            type: string
+          example: AHWEBSHOP
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+          content:
+            application/json:
+              example:
+                transactions:
+                  - amount: 6
+                    type: BOUGHT
+                    date: '2022-07-31T17:46:04'
+                    reason: COLLECT_STORE
+                    hash: 689210023
+                    savingsBoosted: true
+                  - amount: 40
+                    type: BOUGHT
+                    date: '2022-07-31T14:59:05'
+                    reason: COLLECT_STORE
+                    hash: 689210023
+                    savingsBoosted: false
   /mobile-services/stamps/v3/programs:
     get:
       tags:
