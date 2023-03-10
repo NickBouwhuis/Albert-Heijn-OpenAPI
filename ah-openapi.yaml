@@ -9,6 +9,36 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
+  schemas:
+    LocalDateTime:
+      type: string
+      pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$'
+      example: '2023-03-17T17:00:00'
+
+    DeliveryStateInformation:
+      type: object
+      properties:
+        orderId:
+          type: integer
+        state:
+          type: string
+          enum:
+            - ORDERED
+            - IN_PREPARATION
+            - OUT_FOR_DELIVERY
+            - DELIVERED
+        deliveryType:
+          type: string
+          enum:
+            - DELIVERY
+        message:
+          type: string
+        messageContainsDeliveryEta:
+          type: boolean
+        startEstimatedTimeArrival:
+          $ref: '#/components/schemas/LocalDateTime'
+        endEstimatedTimeArrival:
+          $ref: '#/components/schemas/LocalDateTime'
 security:
   - bearerAuth: []
 tags:
@@ -31,6 +61,8 @@ tags:
     description: AH To Go (often seen at train stations) have their own loyalty program
   - name: Shoppinglist
     description: Do CRUD operations on your shopping list
+  - name: Track and Trace
+    description: Keep track of the state of delivery
 paths:
   /mobile-services/stamps/v1/airmiles/balances:
     get:
@@ -13475,3 +13507,16 @@ paths:
                       deliveryLocationId: 8968
                   freeDelivery: false
 
+  /mobile-services/v1/tracktrace/delivery-state-information:
+    get:
+      tags:
+        - Track and Trace
+      summary: Get upcoming delivery status
+      description: Get status of the first upcoming delivery
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryStateInformation'
